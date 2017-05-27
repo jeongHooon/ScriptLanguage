@@ -37,11 +37,17 @@ def extractBookData(strXml):
     tree = ElementTree.fromstring(strXml)
     print(strXml)
     # Book 엘리먼트를 가져옵니다.
-    itemElements = tree.getiterator("item")  # return list type
+    itemElements = tree.getiterator("response")  # return list type
     print(itemElements)
-    for item in itemElements:
-        isbn = item.find("isbn")
-        strTitle = item.find("title")
-        print (strTitle)
-        if len(strTitle.text) > 0 :
-           return {"ISBN":isbn.text,"title":strTitle.text}
+    for a in itemElements:
+        body = a.find("body")
+        for b in body:
+            items = b.find("items")
+            for c in items:
+                item = c.find("item")
+                for d in item:
+                    issucoCustno = d.find("issucoCustno")
+                    issucoNm = d.find("issucoNm")
+                    listNm = d.find("listNm")
+
+                    return {"issucoCustno":issucoCustno.text,"issucoNm":issucoNm.text,"listNm":listNm.text}
