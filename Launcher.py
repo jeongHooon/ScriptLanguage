@@ -11,6 +11,10 @@ def launcherFunction(menu):
         LoadXMLFile()
     elif menu == 'p':
         PrintXML()
+    elif menu == 'g':
+        name = str(input ('input name to get :'))
+        ret = getInfoDataFromname(name)
+        #AddBook(ret)
     else:
         print ("error : unknow menu key")
 
