@@ -1,6 +1,8 @@
 from xmlbook import *
+import urllib
 from http.client import HTTPConnection
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from xml.dom.minidom import parse, parseString
 
 regKey = 'NziFFXEldFsoUvMdgCHihUyTTIhdMuveRk8ec9HFjLV8u9iRO9jqaHYZwd2v6JJmF0MAvV1xJdh9BJHqESaApg%3D%3D'
 server = "api.seibro.or.kr"
@@ -19,23 +21,26 @@ def getInfoDataFromname(find_key):
     global server, regKey, conn
     if conn == None:
         connectOpenAPIServer()
-    uri = userURIBuilder(server, issucoNm=find_key, numOfRows=str(1), ServiceKey=str(regKey))
+    find_key = urllib.parse.quote(find_key)
+    uri = userURIBuilder(server, issucoNm=find_key, numOfRows=str(10000), ServiceKey=regKey)
     # uri = userURIBuilder(server, key=regKey, query='%20', display="1", start="1", target="book_adv", d_isbn=isbn)
     conn.request("GET", uri)
 
     req = conn.getresponse()
     print(req.status)
     if int(req.status) == 200:
+        infoData = req.read().decode('utf-8')
         print("Info data downloading complete!")
-        return extractInfoData(req.read())
+        #return extractInfoData(infoData)
+        return LoadInfoData(infoData)
     else:
         print("OpenAPI request has been failed!! please retry")
         return None
 
-def extractInfoData(strXml):
+def extractInfoData(infoData):
     from xml.etree import ElementTree
-    tree = ElementTree.fromstring(strXml)
-    print(strXml)
+    tree = ElementTree.fromstring(infoData)
+    print(infoData)
     # Book 엘리먼트를 가져옵니다.
     itemElements = tree.getiterator("response")  # return list type
     print(itemElements)
@@ -51,3 +56,10 @@ def extractInfoData(strXml):
                     listNm = d.find("listNm")
 
                     return {"issucoCustno":issucoCustno.text,"issucoNm":issucoNm.text,"listNm":listNm.text}
+def LoadInfoData(infoData):
+    parseData = parseString(infoData)
+    response = parseData.childNodes
+    headerNbody = response[0].childNodes
+    body = headerNbody[1].childNodes
+    items = body[0].childNodes
+    pass
