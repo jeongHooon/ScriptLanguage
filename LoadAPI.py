@@ -12,7 +12,16 @@ def userURIBuilder(server,**user):
     for key in user.keys():
         str += key + "=" + user[key] + "&"
     return str
-
+def userURIBuilder2(server,**user):
+    str = "https://" + server + "/openapi/service/CorpSvc/getIssucoBasicInfo?"
+    for key in user.keys():
+        str += key + "=" + user[key] + "&"
+    return str
+def userURIBuilder3(server,**user):
+    str = "https://" + server + "/openapi/service/FnTermSvc/getFinancialTermMeaning?"
+    for key in user.keys():
+        str += key + "=" + user[key] + "&"
+    return str
 def connectOpenAPIServer():
     global conn, server
     conn = HTTPConnection(server)
@@ -37,29 +46,94 @@ def getInfoDataFromname(find_key):
         print("OpenAPI request has been failed!! please retry")
         return None
 
-def extractInfoData(infoData):
-    from xml.etree import ElementTree
-    tree = ElementTree.fromstring(infoData)
-    print(infoData)
-    # Book 엘리먼트를 가져옵니다.
-    itemElements = tree.getiterator("response")  # return list type
-    print(itemElements)
-    for a in itemElements:
-        body = a.find("body")
-        for b in body:
-            items = b.find("items")
-            for c in items:
-                item = c.find("item")
-                for d in item:
-                    issucoCustno = d.find("issucoCustno")
-                    issucoNm = d.find("issucoNm")
-                    listNm = d.find("listNm")
+def getInfoFromNum(find_key):
+    global server, regKey, conn
+    if conn == None:
+        connectOpenAPIServer()
+    #find_key = urllib.parse.quote(find_key)
+    uri = userURIBuilder2(server, issucoCustno=find_key, ServiceKey=regKey)
+    conn.request("GET", uri)
 
-                    return {"issucoCustno":issucoCustno.text,"issucoNm":issucoNm.text,"listNm":listNm.text}
+    req = conn.getresponse()
+    print(req.status)
+    if int(req.status) == 200:
+        infoData = req.read().decode('utf-8')
+        print("Info data downloading complete!")
+
+        return LoadInfoData2(infoData)
+    else:
+        print("OpenAPI request has been failed!! please retry")
+        return None
+
+def getInfoFromKey(find_key):
+    global server, regKey, conn
+    if conn == None:
+        connectOpenAPIServer()
+    find_key = urllib.parse.quote(find_key)
+    uri = userURIBuilder3(server, term=find_key, numOfRows=str(10000), ServiceKey=regKey)
+    conn.request("GET", uri)
+
+    req = conn.getresponse()
+    print(req.status)
+    if int(req.status) == 200:
+        infoData = req.read().decode('utf-8')
+        print("Info data downloading complete!")
+
+        return LoadInfoData3(infoData)
+    else:
+        print("OpenAPI request has been failed!! please retry")
+        return None
+
 def LoadInfoData(infoData):
+    global conn
     parseData = parseString(infoData)
     response = parseData.childNodes
     headerNbody = response[0].childNodes
     body = headerNbody[1].childNodes
     items = body[0].childNodes
-    pass
+    for item in items:
+        issucoCustno = item.childNodes[0]
+        issucoCustnoData = issucoCustno.childNodes[0].data
+        issucoNm = item.childNodes[1]
+        issucoNmData = issucoNm.childNodes[0].data
+        if item.childNodes.length == 3:
+            listNm = item.childNodes[2]
+            listNmData = listNm.childNodes[0].data
+            print("발행번호: ", issucoCustnoData, "\n기업이름: ", issucoNmData, "listNm", listNmData)
+        else:
+            print("발행번호: ", issucoCustnoData, "\n기업이름: ", issucoNmData)
+    conn.close()
+
+def LoadInfoData2(infoData):
+    global conn
+    parseData = parseString(infoData)
+    response = parseData.childNodes
+    headerNbody = response[0].childNodes
+    body = headerNbody[1].childNodes
+    item = body[0].childNodes
+    for ele in item:
+        if ele.localName == 'engCustNm':
+            engCustNmData = ele.childNodes[0].data
+        if ele.localName == 'ceoNm':
+            ceoNmData = ele.childNodes[0].data
+        if ele.localName == 'founDt':
+            founDtData = ele.childNodes[0].data
+        if ele.localName == 'totalStkCnt':
+            totalStkCntData = ele.childNodes[0].data
+    print("기업명: ",engCustNmData, "\nCeo: ", ceoNmData, "\n설립일: ", founDtData, "\n총 발행 주식 수: ", totalStkCntData)
+    conn.close()
+
+def LoadInfoData3(infoData):
+    global conn
+    parseData = parseString(infoData)
+    response = parseData.childNodes
+    headerNbody = response[0].childNodes
+    body = headerNbody[1].childNodes
+    items = body[0].childNodes
+    for item in items:
+        fnceDictNm = item.childNodes[0]
+        fnceDictNmData = fnceDictNm.childNodes[0].data
+        ksdFnceDictDescContent = item.childNodes[1]
+        ksdFnceDictDescContentData = ksdFnceDictDescContent.childNodes[0].data
+        print("용어명: ", fnceDictNmData, "\n설명: ", ksdFnceDictDescContentData)
+    conn.close()
