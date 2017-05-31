@@ -17,6 +17,11 @@ def userURIBuilder2(server,**user):
     for key in user.keys():
         str += key + "=" + user[key] + "&"
     return str
+def userURIBuilder4(server,**user):
+    str = "https://" + server + "/openapi/service/CorpSvc/getSecnIssuInfoStock?"
+    for key in user.keys():
+        str += key + "=" + user[key] + "&"
+    return str
 def userURIBuilder3(server,**user):
     str = "https://" + server + "/openapi/service/FnTermSvc/getFinancialTermMeaning?"
     for key in user.keys():
@@ -53,7 +58,6 @@ def getInfoFromNum(find_key):
     #find_key = urllib.parse.quote(find_key)
     uri = userURIBuilder2(server, issucoCustno=find_key, ServiceKey=regKey)
     conn.request("GET", uri)
-
     req = conn.getresponse()
     print(req.status)
     if int(req.status) == 200:
@@ -61,6 +65,20 @@ def getInfoFromNum(find_key):
         print("Info data downloading complete!")
 
         return LoadInfoData2(infoData)
+    else:
+        print("OpenAPI request has been failed!! please retry")
+        return None
+def getStockFromNum(find_key):
+    global server, regKey, conn
+    if conn == None:
+        connectOpenAPIServer()
+    #find_key = urllib.parse.quote(find_key)
+    uri = userURIBuilder4(server, issucoCustno=find_key, ServiceKey=regKey)
+    conn.request("GET", uri)
+    req = conn.getresponse()
+    if int(req.status) == 200:
+        infoData = req.read().decode('utf-8')
+        return LoadInfoData4(infoData)
     else:
         print("OpenAPI request has been failed!! please retry")
         return None
@@ -136,4 +154,19 @@ def LoadInfoData3(infoData):
         ksdFnceDictDescContent = item.childNodes[1]
         ksdFnceDictDescContentData = ksdFnceDictDescContent.childNodes[0].data
         print("용어명: ", fnceDictNmData, "\n설명: ", ksdFnceDictDescContentData)
+    conn.close()
+
+def LoadInfoData4(infoData):
+    global conn
+    parseData = parseString(infoData)
+    response = parseData.childNodes
+    headerNbody = response[0].childNodes
+    body = headerNbody[1].childNodes
+    items = body[0].childNodes
+    for item in items:
+        caltotMartTpcd = item.childNodes[0]
+        caltotMartTpcdData = caltotMartTpcd.childNodes[0].data
+        stkKacd = item.childNodes[4]
+        stkKacdData = stkKacd.childNodes[0].data
+        print("상장구분명: ", caltotMartTpcdData, "\n주식종류명: ", stkKacdData)
     conn.close()
