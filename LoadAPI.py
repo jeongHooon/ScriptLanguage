@@ -37,7 +37,6 @@ def getInfoDataFromname(find_key):
         connectOpenAPIServer()
     find_key = urllib.parse.quote(find_key)
     uri = userURIBuilder(server, issucoNm=find_key, numOfRows=str(10000), ServiceKey=regKey)
-    # uri = userURIBuilder(server, key=regKey, query='%20', display="1", start="1", target="book_adv", d_isbn=isbn)
     conn.request("GET", uri)
 
     req = conn.getresponse()
@@ -45,7 +44,6 @@ def getInfoDataFromname(find_key):
     if int(req.status) == 200:
         infoData = req.read().decode('utf-8')
         print("Info data downloading complete!")
-        #return extractInfoData(infoData)
         return LoadInfoData(infoData)
     else:
         print("OpenAPI request has been failed!! please retry")
@@ -55,7 +53,6 @@ def getInfoFromNum(find_key):
     global server, regKey, conn
     if conn == None:
         connectOpenAPIServer()
-    #find_key = urllib.parse.quote(find_key)
     uri = userURIBuilder2(server, issucoCustno=find_key, ServiceKey=regKey)
     conn.request("GET", uri)
     req = conn.getresponse()
@@ -72,7 +69,6 @@ def getStockFromNum(find_key):
     global server, regKey, conn
     if conn == None:
         connectOpenAPIServer()
-    #find_key = urllib.parse.quote(find_key)
     uri = userURIBuilder4(server, issucoCustno=find_key, ServiceKey=regKey)
     conn.request("GET", uri)
     req = conn.getresponse()
@@ -108,18 +104,21 @@ def LoadInfoData(infoData):
     response = parseData.childNodes
     headerNbody = response[0].childNodes
     body = headerNbody[1].childNodes
-    items = body[0].childNodes
-    for item in items:
-        issucoCustno = item.childNodes[0]
-        issucoCustnoData = issucoCustno.childNodes[0].data
-        issucoNm = item.childNodes[1]
-        issucoNmData = issucoNm.childNodes[0].data
-        if item.childNodes.length == 3:
-            listNm = item.childNodes[2]
-            listNmData = listNm.childNodes[0].data
-            print("발행번호: ", issucoCustnoData, "\n기업이름: ", issucoNmData, "listNm", listNmData)
-        else:
-            print("발행번호: ", issucoCustnoData, "\n기업이름: ", issucoNmData)
+    try:
+        items = body[0].childNodes
+        for item in items:
+            issucoCustno = item.childNodes[0]
+            issucoCustnoData = issucoCustno.childNodes[0].data
+            issucoNm = item.childNodes[1]
+            issucoNmData = issucoNm.childNodes[0].data
+            if item.childNodes.length == 3:
+                listNm = item.childNodes[2]
+                listNmData = listNm.childNodes[0].data
+                print("발행번호: ", issucoCustnoData, "\n기업이름: ", issucoNmData, "listNm", listNmData)
+            else:
+                print("발행번호: ", issucoCustnoData, "\n기업이름: ", issucoNmData)
+    except:
+        print("해당 발행번호에 대한 정보가 존재하지 않습니다.")
     conn.close()
 
 def LoadInfoData2(infoData):
@@ -128,17 +127,20 @@ def LoadInfoData2(infoData):
     response = parseData.childNodes
     headerNbody = response[0].childNodes
     body = headerNbody[1].childNodes
-    item = body[0].childNodes
-    for ele in item:
-        if ele.localName == 'engCustNm':
-            engCustNmData = ele.childNodes[0].data
-        if ele.localName == 'ceoNm':
-            ceoNmData = ele.childNodes[0].data
-        if ele.localName == 'founDt':
-            founDtData = ele.childNodes[0].data
-        if ele.localName == 'totalStkCnt':
-            totalStkCntData = ele.childNodes[0].data
-    print("기업명: ",engCustNmData, "\nCeo: ", ceoNmData, "\n설립일: ", founDtData, "\n총 발행 주식 수: ", totalStkCntData)
+    try:
+        item = body[0].childNodes
+        for ele in item:
+            if ele.localName == 'engCustNm':
+                engCustNmData = ele.childNodes[0].data
+            if ele.localName == 'ceoNm':
+                ceoNmData = ele.childNodes[0].data
+            if ele.localName == 'founDt':
+                founDtData = ele.childNodes[0].data
+            if ele.localName == 'totalStkCnt':
+                totalStkCntData = ele.childNodes[0].data
+        print("기업명: ",engCustNmData, "\nCeo: ", ceoNmData, "\n설립일: ", founDtData, "\n총 발행 주식 수: ", totalStkCntData)
+    except:
+        print("해당 발행번호에 대한 정보가 존재하지 않습니다.")
     conn.close()
 
 def LoadInfoData3(infoData):
