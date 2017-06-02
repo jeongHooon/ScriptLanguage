@@ -1,6 +1,6 @@
 loopFlag = 1
 from LoadAPI import *
-
+from GUI import *
 def printMenu():
     print("========Menu==========")
     print("발행번호 검색:  g")
@@ -28,6 +28,7 @@ def QuitBookMgr():
     BooksFree()
 
 while (loopFlag > 0):
+    start()
     printMenu()
     menuKey = str(input('select menu :'))
     launcherFunction(menuKey)
