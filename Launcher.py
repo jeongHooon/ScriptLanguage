@@ -26,9 +26,9 @@ def QuitBookMgr():
     global loopFlag
     loopFlag = 0
     BooksFree()
-
+start()
 while (loopFlag > 0):
-    start()
+
     printMenu()
     menuKey = str(input('select menu :'))
     launcherFunction(menuKey)
