@@ -1,9 +1,27 @@
 from tkinter import *
-
+check = False
+window = Tk()
+window.geometry("730x250")
+def process():
+    global check
+    global searchList1
+    global searchList2
+    searchList1.destroy()
+    searchList2.destroy()
+    searchList1 = Listbox(window, width=20)
+    searchList1.place(x=110, y=50)
+    searchList2 = Listbox(window, width=20)
+    searchList2.place(x=420, y=50)
+    check = True
 def start():
-    window = Tk()
-    window.geometry("730x250")
-    button1 = Button(window, text="발행정보\n조회", font = 20,cursor="hand2")
+    global  check
+    global searchList1
+    global searchList2
+    searchList1 = Listbox(window, width=42)
+    searchList1.place(x=110, y=50)
+    searchList2 = Listbox(window, width=42)
+    searchList2.place(x=420, y=50)
+    button1 = Button(window, text="발행정보\n조회", font = 20,cursor="hand2",command = process)
     button1.place(x=10,y=10)
     button2 = Button(window, text="기업정보\n조회", font = 20,cursor="hand2")
     button2.place(x=10,y=70)
@@ -15,10 +33,4 @@ def start():
     inputText.place(x = 110, y = 10)
     button5 = Button(window, text = "검색",font = 20, cursor = "hand2")
     button5.place(x=670,y=10)
-    searchList1 = Listbox(window, width=42)
-    searchList1.place(x=110, y=50)
-    searchList2 = Listbox(window, width=42)
-    searchList2.place(x=420, y=50)
-
-
     window.mainloop()
