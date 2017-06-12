@@ -6,6 +6,13 @@ def process():
     text = str(inputText.get())
     if state == Search.CustNo:
         getInfoDataFromname(text)
+    elif state == Search.BasicInfo:
+        getInfoFromNum(text)
+    elif state == Search.StockIn:
+        getStockFromNum(text)
+    elif state == Search.FinancialMean:
+        getInfoFromKey(text)
+
 class Search(enum.Enum):
     CustNo = 0
     BasicInfo = 1
@@ -17,6 +24,7 @@ def IssucoCustno():
     global check
     global searchList1
     global searchList2
+    global state
     searchList1.destroy()
     searchList2.destroy()
     searchList1 = Listbox(window, width=20)
@@ -30,6 +38,7 @@ def IssucoBasicInfo():
     global check
     global searchList1
     global searchList2
+    global state
     searchList1.destroy()
     searchList2.destroy()
     searchList1 = Listbox(window, width=61)
@@ -41,6 +50,7 @@ def FinancialTermMeaning():
     global check
     global searchList1
     global searchList2
+    global state
     searchList1.destroy()
     searchList2.destroy()
     searchList1 = Listbox(window, width=30)
@@ -54,6 +64,7 @@ def StockInfo():
     global check
     global searchList1
     global searchList2
+    global state
     searchList1.destroy()
     searchList2.destroy()
     searchList1 = Listbox(window, width=30)
