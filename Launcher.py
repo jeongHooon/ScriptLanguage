@@ -30,7 +30,6 @@ def QuitBookMgr():
     BooksFree()
 start()
 while (loopFlag > 0):
-
     printMenu()
     menuKey = str(input('select menu :'))
     launcherFunction(menuKey)

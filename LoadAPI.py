@@ -142,7 +142,7 @@ def LoadInfoData2(infoData):
         print("해당 발행번호에 대한 정보가 존재하지 않습니다.")
     conn.close()
 
-def LoadInfoData3(infoData):
+def LoadInfoData3(infoData,msg):
     global conn
     parseData = parseString(infoData)
     response = parseData.childNodes

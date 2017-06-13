@@ -1,7 +1,9 @@
 from tkinter import *
 from LoadAPI import *
+
 window = Tk()
 window.geometry("730x250")
+
 def process():
     text = str(inputText.get())
     if state == Search.CustNo:
@@ -72,9 +74,43 @@ def StockInfo():
     searchList2 = Listbox(window, width=20)
     searchList2.place(x=420, y=50)
     state = Search.StockIn
+def send_mail():
+    import smtplib
+    from email.mime.base import MIMEBase
+    from email.mime.text import MIMEText
+
+    # global value
+    host = "smtp.gmail.com"  # Gmail STMP 서버 주소.
+    port = "587"
+    htmlFileName = "book.xml"
+
+    senderAddr = "pkekzm6239@gmail.com" # 보내는 사람 email 주소.
+    recipientAddr = "pkekzm6239@naver.com"  # 받는 사람 email 주소.
+
+    msg = MIMEBase("multipart", "alternative")
+    msg['Subject'] = "Test email in Python 3.5"
+    msg['From'] = senderAddr
+    msg['To'] = recipientAddr
+    htmlFD = open(htmlFileName, 'rb')
+    HtmlPart = MIMEText(htmlFD.read(), 'html', _charset='UTF-8')
+    htmlFD.close()
+
+    # 만들었던 mime을 MIMEBase에 첨부 시킨다.
+    msg.attach(HtmlPart)
+
+    # 메일을 발송한다.
+    s = smtplib.SMTP(host, port)
+    # s.set_debuglevel(1)        # 디버깅이 필요할 경우 주석을 푼다.
+    s.ehlo()
+    s.starttls()
+    s.ehlo()
+    s.login("pkekzm6239@gmail.com","vosalxld!0625")
+    s.sendmail(senderAddr, [recipientAddr], msg.as_string())
+    s.close()
+
 
 def start():
-    global  check
+    global check
     global searchList1
     global searchList2
     global inputText
@@ -90,6 +126,8 @@ def start():
     button3.place(x=10,y=130)
     button4 = Button(window, text="금융용어\n조회", font = 20,cursor="hand2", command = FinancialTermMeaning)
     button4.place(x=10,y=190)
+    button5 = Button(window, text="aaa", font=20, cursor="hand2", command=send_mail)
+    button5.place(x=80, y=190)
     inputText = Entry(window,width = 50,font = 10)
     inputText.place(x = 110, y = 10)
     button5 = Button(window, text="검색", font=20, cursor="hand2", command=process)
