@@ -5,6 +5,7 @@ window = Tk()
 window.geometry("730x250")
 
 def process():
+    global dic
     text = str(inputText.get())
     if state == Search.CustNo:
         getInfoDataFromname(text)
@@ -13,7 +14,15 @@ def process():
     elif state == Search.StockIn:
         getStockFromNum(text)
     elif state == Search.FinancialMean:
-        getInfoFromKey(text)
+        dic = getInfoFromKey(text)
+        insertList()
+def select():
+    global searchList1
+    global searchList2
+    global dic
+    searchList2.delete(0,)
+    searchList2.insert(END,dic[searchList1.get(searchList1.curselection()[0])])
+    searchList2.yview_scroll ( 3, PAGES )
 
 class Search(enum.Enum):
     CustNo = 0
@@ -60,6 +69,14 @@ def FinancialTermMeaning():
     searchList2 = Listbox(window, width=20)
     searchList2.place(x=420, y=50)
     state = Search.FinancialMean
+def insertList():
+    global dic
+    global searchList1
+    global searchList2
+
+    for d in dic.keys():
+        searchList1.insert(END,d);
+
 
 
 def StockInfo():
@@ -126,8 +143,10 @@ def start():
     button3.place(x=10,y=130)
     button4 = Button(window, text="금융용어\n조회", font = 20,cursor="hand2", command = FinancialTermMeaning)
     button4.place(x=10,y=190)
-    button5 = Button(window, text="aaa", font=20, cursor="hand2", command=send_mail)
-    button5.place(x=80, y=190)
+    #button5 = Button(window, text="aaa", font=20, cursor="hand2", command=send_mail)
+    #button5.place(x=80, y=190)
+    buttonS = Button(window, text="Select", font=20, cursor="hand2", command=select)
+    buttonS.place(x=380, y=210)
     inputText = Entry(window,width = 50,font = 10)
     inputText.place(x = 110, y = 10)
     button5 = Button(window, text="검색", font=20, cursor="hand2", command=process)
